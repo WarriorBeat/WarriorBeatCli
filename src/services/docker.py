@@ -4,9 +4,11 @@
 
 """
 
-import docker
 import click
+import docker
+
 from utils import ServiceLog
+
 
 DOCKER_CONTAINERS = {
     'db': {
@@ -70,3 +72,22 @@ def stop(container):
     except docker.errors.APIError as e:
         s.error(f"Failed to stop $[{cont['name']}] container!")
         s.error(str(e))
+
+
+def status():
+    """docker status"""
+    client = get_client().containers
+    status = []
+    for c in DOCKER_CONTAINERS.values():
+        c_stat = []
+        c_stat.append(c['name'])
+        try:
+            cont = client.get(c['name'])
+            is_running = click.style(
+                '\u2714', fg='green') if cont.status == 'running' else click.style('\u2716', fg='red')
+        except:
+            cont = c
+            is_running = False
+        c_stat.append(is_running)
+        status.append(c_stat)
+    return status
