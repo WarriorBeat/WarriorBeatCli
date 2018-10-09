@@ -1,0 +1,7 @@
+run.py
+WarriorBeatCli.egg-info/PKG-INFO
+WarriorBeatCli.egg-info/SOURCES.txt
+WarriorBeatCli.egg-info/dependency_links.txt
+WarriorBeatCli.egg-info/entry_points.txt
+WarriorBeatCli.egg-info/requires.txt
+WarriorBeatCli.egg-info/top_level.txt

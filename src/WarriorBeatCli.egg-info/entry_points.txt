@@ -1,0 +1,4 @@
+
+        [console_scripts]
+        wb=run:cli
+    

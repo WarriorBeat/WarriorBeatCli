@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+blessings = "*"
+click = "*"
+docker = "*"
+warriorbeatcli = {editable = true, path = "./src"}
+tqdm = "*"
+pylint = "*"
+colorama = "*"
+
+[dev-packages]
+pylint = "*"
+autoflake = "*"
+"autopep8" = "*"
+rope = "*"
+
+[requires]
+python_version = "3.7"
