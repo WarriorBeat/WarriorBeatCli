@@ -10,6 +10,8 @@ import click
 
 from services import Service
 from utils import ServiceLog
+from tabulate import tabulate
+from art import text2art
 
 s = ServiceLog('WBCLI', 'bright_blue', root=True)
 
@@ -30,6 +32,20 @@ def setaws(profile):
     click.secho(f'{profile}', fg='cyan', bold=True)
 
 
+@cli.command()
+def status():
+    s.clear()
+    title = text2art('WB CLI', font='swampland')
+    run = click.style('\u2714', fg='green')
+    stop = click.style('\u2718', fg='red')
+    _status = [Service(s).status() for s in Service.SERVICE_LIST]
+    status = [list(run if r == True else stop if r == False else r for r in st)
+              for st in _status]
+    click.secho(title, fg='bright_cyan')
+    click.echo(tabulate(status, headers=[
+               'Service', 'Running'], tablefmt="fancy_grid", stralign="center"))
+
+
 @cli.group()
 def api():
     """
@@ -47,7 +63,7 @@ def start(service):
     if service == 'all':
         s.info(
             f"Starting all services: $[{', '.join(map(str, [s for s in Service.SERVICE_LIST]))}]\n")
-        return [Service(s).start() for s in Service.SERVICE_LIST if s != 'api']
+        return [Service(s).start() for s in Service.SERVICE_LIST]
     service = Service(service)
     s.info(f"Starting $[{service.name}]\n")
     service.start()
@@ -60,7 +76,7 @@ def stop(service):
     if service == 'all':
         s.info(
             f"Stopping all services: $[{', '.join(map(str, [s for s in Service.SERVICE_LIST]))}]\n")
-        return [Service(s).stop() for s in Service.SERVICE_LIST if s != 'api']
+        return [Service(s).stop() for s in Service.SERVICE_LIST]
     service = Service(service)
     s.info(f"Stopping $[{service.name}]\n")
     service.stop()
@@ -71,7 +87,7 @@ def stop(service):
 def restart(service):
     """Restarts the given service"""
     if service == 'all':
-        return [Service(s).restart() for s in Service.SERVICE_LIST if s != 'api']
+        return [Service(s).restart() for s in Service.SERVICE_LIST]
     service = Service(service)
     s.info(f"Restarting $[{service.name}]")
     service.restart()

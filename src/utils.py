@@ -3,9 +3,11 @@
     Utilities for WarriorBeatCLI
 
 """
+import configparser
 import re
+from pathlib import Path
 
-from click import clear, secho, style
+from click import clear, confirm, prompt, secho, style
 
 
 class ServiceLog:
@@ -20,11 +22,11 @@ class ServiceLog:
         self.info_color = kwargs.get('info_color', 'white')
         self.accent_color = kwargs.get('accent_color', 'yellow')
         self.warn_color = kwargs.get('warn_color', 'green')
+        self.config_path = Path.home() / '.wbcli'
 
-    def parse_msg(self, msg, accent_color):
-        # msg_special = re.findall(r'\$\[(.*?)\]', msg)
+    def parse_msg(self, msg, accent_color=None):
         msg_special = re.findall(r'\$(.*?)\[(.*?)\]', msg)
-        color = accent_color
+        color = accent_color or self.accent_color
         for w in msg_special:
             if w[0] == 'w':
                 color = self.warn_color
@@ -33,8 +35,9 @@ class ServiceLog:
         return msg
 
     def get_service(self, **kwargs):
+        color = kwargs.pop('fg', self.base_color)
         title = style(
-            f"[{self.service_name}] \u276f", **kwargs)
+            f"[{self.service_name}] \u276f", fg=color, **kwargs)
         return title
 
     def echo(self, msg, **kwargs):
@@ -59,6 +62,50 @@ class ServiceLog:
 
     def exception(self, error, **kwargs):
         return self.echo(str(error), title_color='red', title_bold=True, **kwargs)
+
+    def prompt(self, msg, **kwargs):
+        new_line = kwargs.pop('nl', False)
+        nl_default = kwargs.get('default', None)
+        msg = self.parse_msg(msg)
+        msg = msg + \
+            style(f"\n Press Enter to Use: [{nl_default}]", dim=True) if len(
+                nl_default) > 0 else msg
+        title = self.get_service()
+        suffix = style('\u27a4 ', fg=self.accent_color)
+        secho(f"{self.parent_name} {title} ", nl=False)
+        return prompt(msg + '\n' if new_line else msg,
+                      prompt_suffix=suffix, **kwargs)
+
+    def confirm(self, msg, **kwargs):
+        msg = self.parse_msg(msg)
+        title = self.get_service()
+        suffix = style('\u27a4 ', fg=self.accent_color)
+        secho(f"{self.parent_name} {title} ", nl=False)
+        return confirm(msg, show_default="[y/N] ", prompt_suffix=suffix, **kwargs)
+
+    def save(self, section, key, value):
+        if not self.config_path.exists():
+            self.config_path.mkdir(parents=True, exist_ok=True)
+        config_file = self.config_path / 'config.ini'
+        config = configparser.ConfigParser()
+        if config_file.exists():
+            config.read(config_file)
+        try:
+            config.set(section, key, value)
+        except configparser.NoSectionError:
+            config.add_section(section)
+            config.set(section, key, value)
+        with config_file.open(mode='w') as cfile:
+            config.write(cfile)
+
+    def retrieve(self, section, key):
+        config_file = self.config_path / 'config.ini'
+        config = configparser.ConfigParser()
+        try:
+            config.read(config_file)
+            return config.get(section, key)
+        except Exception:
+            return None
 
     def clear(self):
         """Clears terminal screen"""

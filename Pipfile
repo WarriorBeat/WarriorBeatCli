@@ -13,6 +13,8 @@ colorama = "*"
 tabulate = "*"
 art = "*"
 blessed = "*"
+gitpython = "*"
+psutil = "*"
 
 [dev-packages]
 pylint = "*"

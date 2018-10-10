@@ -34,5 +34,8 @@ class ServiceManager:
     def restart(self):
         self.service.restart()
 
+    def status(self):
+        return self.service.status()
+
 
 Service = ServiceManager

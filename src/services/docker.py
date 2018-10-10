@@ -103,3 +103,8 @@ class DockerService(GenericService):
         self.log.info(f"{_container_id} is restarting...")
         self.container.restart()
         self.log.info(f"{_container_id} is $w[live!]\n")
+
+    def status(self):
+        status = [self.name]
+        status.append(True if self._is_running() is not False else False)
+        return status

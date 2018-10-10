@@ -1,11 +1,14 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     name='WarriorBeatCli',
     version='0.1',
     py_modules=['run'],
+    packages=find_packages(),
     install_requires=[
         'Click',
+        'GitPython',
+        'psutil'
     ],
     entry_points='''
         [console_scripts]

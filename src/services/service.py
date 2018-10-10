@@ -20,6 +20,9 @@ class GenericService():
     def restart(self):
         raise NotImplementedError()
 
+    def status(self):
+        raise NotImplementedError()
+
     @classmethod
     def supports(cls, id):
         return True if id in cls.SERVICES else False
