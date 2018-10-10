@@ -8,7 +8,7 @@ import click
 import os
 import time
 from tqdm import tqdm
-from services import docker
+from services import Service
 from utils import ServiceLog
 from tabulate import tabulate
 
@@ -41,45 +41,39 @@ def api():
     pass
 
 
-SERVICES = ['all', 's3', 'db', 'api']
-
-
 @api.command()
-@click.argument('service', default='all', type=click.Choice(SERVICES))
+@click.argument('service', default='all', type=click.Choice([*Service.SERVICE_LIST, 'all']))
 def start(service):
     """
     Starts the various services used during API development
     """
-    dock_services = ['db', 's3']
-    if service is 'all':
+    if service == 'all':
         s.info(
-            f"Starting: $[{', '.join(map(str, [s for s in SERVICES if s != 'all']))}]")
-        return [docker.start(con) for con in dock_services]
-    s.info(f"Starting $[{service}]")
-    if service in ['db', 's3']:
-        docker.start(service)
+            f"Starting all services: $[{', '.join(map(str, [s for s in Service.SERVICE_LIST]))}]\n")
+        return [Service(s).start() for s in Service.SERVICE_LIST if s != 'api']
+    service = Service(service)
+    s.info(f"Starting $[{service.name}]\n")
+    service.start()
 
 
 @api.command()
 @click.argument('service', default='all', type=click.Choice(['all', 's3', 'db', 'api']))
 def stop(service):
     """Stops any running service"""
-    dock_services = ['db', 's3']
-    if service is 'all':
+    if service == 'all':
         s.info(
-            f"Stopping: $[{', '.join(map(str, [s for s in SERVICES if s != 'all']))}]")
-        return [docker.stop(con) for con in dock_services]
-    s.info(f"Stopping $[{service}]")
-    if service in ['db', 's3']:
-        docker.stop(service)
+            f"Stopping all services: $[{', '.join(map(str, [s for s in Service.SERVICE_LIST]))}]\n")
+        return [Service(s).stop() for s in Service.SERVICE_LIST if s != 'api']
+    service = Service(service)
+    s.info(f"Stopping $[{service.name}]\n")
+    service.stop()
 
 
 @api.command()
-def status():
-    """get status of running services"""
-    status = [['Service', 'Is Running']]
-    dock_stat = docker.status()
-    status.extend(dock_stat)
-    # click.echo(status)
-    click.echo(tabulate(status, headers="firstrow",
-                        tablefmt='fancy_grid', stralign="center"))
+@click.argument('service', default='all', type=click.Choice(['all', 's3', 'db', 'api']))
+def restart(service):
+    if service == 'all':
+        return [Service(s).restart() for s in Service.SERVICE_LIST if s != 'api']
+    service = Service(service)
+    s.info(f"Restarting $[{service.name}]")
+    service.restart()
