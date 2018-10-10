@@ -4,13 +4,12 @@
 
 """
 
-import click
 import os
-import time
-from tqdm import tqdm
+
+import click
+
 from services import Service
 from utils import ServiceLog
-from tabulate import tabulate
 
 s = ServiceLog('WBCLI', 'bright_blue', root=True)
 
@@ -20,7 +19,6 @@ def cli():
     """
     Simple Command line tool for managing WarriorBeat Services
     """
-    pass
 
 
 @cli.command()
@@ -38,7 +36,6 @@ def api():
     WarriorBeatApi Management
     """
     click.echo()
-    pass
 
 
 @api.command()
@@ -72,6 +69,7 @@ def stop(service):
 @api.command()
 @click.argument('service', default='all', type=click.Choice(['all', 's3', 'db', 'api']))
 def restart(service):
+    """Restarts the given service"""
     if service == 'all':
         return [Service(s).restart() for s in Service.SERVICE_LIST if s != 'api']
     service = Service(service)

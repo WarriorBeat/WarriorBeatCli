@@ -3,8 +3,9 @@
     Utilities for WarriorBeatCLI
 
 """
-from click import secho, style, clear
 import re
+
+from click import clear, secho, style
 
 
 class ServiceLog:
