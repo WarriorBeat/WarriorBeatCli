@@ -68,7 +68,7 @@ class ServiceLog:
         nl_default = kwargs.get('default', None)
         msg = self.parse_msg(msg)
         msg = msg + \
-            style(f"\n Press Enter to Use: [{nl_default}]", dim=True) if len(
+            style(f"\n Press Enter to Use: [{nl_default}]", dim=True) if nl_default and len(
                 nl_default) > 0 else msg
         title = self.get_service()
         suffix = style('\u27a4 ', fg=self.accent_color)

@@ -67,7 +67,10 @@ class DockerService(GenericService):
     def _is_running(self, container=None):
         """checks if a container is running"""
         container = container or self.container
-        return True if container.status == 'running' else False
+        try:
+            return True if container.status == 'running' else False
+        except AttributeError:
+            return False
 
     def start(self):
         """starts container"""

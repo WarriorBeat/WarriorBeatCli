@@ -79,7 +79,7 @@ class APIService(GenericService):
         try:
             last_pid = int(self.log.retrieve('API', 'PID'))
             return last_pid if psutil.pid_exists(last_pid) is True else False
-        except ValueError:
+        except:
             return False
 
     def _output_flask(self, proc):

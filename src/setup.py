@@ -10,7 +10,8 @@ setup(
         'GitPython',
         'psutil',
         'tabulate',
-        'art'
+        'art',
+        'docker'
     ],
     entry_points='''
         [console_scripts]
