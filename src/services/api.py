@@ -12,10 +12,10 @@ import psutil
 from git import Repo
 
 from utils import ServiceLog
-
+import threading
 from .service import GenericService
 
-API = {
+FLASK = {
     'api': {
         'name': 'WarriorBeatApi',
         'origin_url': 'https://github.com/WarriorBeat/WarriorBeatApi.git',
@@ -28,14 +28,16 @@ API = {
 
 class APIService(GenericService):
     """API Type Services"""
-    SERVICES = API
+    SERVICES = FLASK
 
-    def __init__(self, id):
+    def __init__(self, id, debug=False, live=False):
         self.id = id
         self.log = ServiceLog('API', 'bright_magenta')
-        self.data = API[self.id]
+        self.data = FLASK[self.id]
         self.name = self.data['name']
         self.path = None
+        self.debug = debug
+        self.live = live
 
     def _validate_path(self, path):
         try:
@@ -80,6 +82,10 @@ class APIService(GenericService):
         except ValueError:
             return False
 
+    def _output_flask(self, proc):
+        for l in iter(proc.stdout.readline, b''):
+            print(l.decode('utf-8'), end='')
+
     def start(self):
         """starts wbapi flask service"""
         if self._is_running():
@@ -87,13 +93,22 @@ class APIService(GenericService):
         self.path = self._get_path()
         self.log.info('Setting Flask environment variables...')
         for evar in self.data['env']:
+            if self.live and evar == 'FLASK_TESTING':
+                self.data['env'][evar] = 'False'
             env_val = self.data['env'][evar]
             self.log.info(
                 f"$[{evar}] \u279C $w[{'...' + env_val[20:] if len(env_val) > 20 else env_val}]")
             os.environ[evar] = self.data['env'][evar]
         args = self.data['args']
         args.append(self.data['port'])
-        flask_proc = subp.Popen(args, stdout=subp.DEVNULL, stderr=subp.STDOUT)
+        out = subp.DEVNULL
+        if self.debug:
+            out = subp.PIPE
+        flask_proc = psutil.Popen(args, stdout=out, stderr=subp.STDOUT)
+        if self.debug:
+            outp = threading.Thread(
+                target=self._output_flask, args=(flask_proc, ))
+            outp.start()
         self.log.info(f"API started on port $[{self.data['port']}]")
         self.log.save('API', 'PID', str(flask_proc.pid))
         return self.log.info(f'$[{self.name}] is $w[live!]')

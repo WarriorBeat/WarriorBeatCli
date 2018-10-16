@@ -8,7 +8,9 @@ setup(
     install_requires=[
         'Click',
         'GitPython',
-        'psutil'
+        'psutil',
+        'tabulate',
+        'art'
     ],
     entry_points='''
         [console_scripts]

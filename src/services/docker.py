@@ -28,8 +28,9 @@ class DockerService(GenericService):
     """Management for docker related services"""
     SERVICES = DOCKER
 
-    def __init__(self, id):
+    def __init__(self, id, debug=False, live=False):
         self.id = id
+        self.live = live
         self.log = ServiceLog('Docker', 'cyan')
         self.client = self._get_client()
         self.data = self.SERVICES[self.id]
@@ -70,6 +71,8 @@ class DockerService(GenericService):
 
     def start(self):
         """starts container"""
+        if self.live:
+            return self.log.warn(f"{self.name} cannot run in live mode.\n")
         if self.container:
             self.log.info(
                 f"Found container $[{self.name}] $[({self.container.short_id})]")

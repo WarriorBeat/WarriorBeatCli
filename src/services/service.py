@@ -8,8 +8,9 @@ class GenericService():
     """Generic Service Base Class"""
     SERVICES = None
 
-    def __init__(self, id):
+    def __init__(self, id, debug=False):
         self.id = id
+        self.debug = debug
 
     def start(self):
         raise NotImplementedError()

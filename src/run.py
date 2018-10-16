@@ -34,6 +34,9 @@ def setaws(profile):
 
 @cli.command()
 def status():
+    '''
+    View active services
+    '''
     s.clear()
     title = text2art('WB CLI', font='swampland')
     run = click.style('\u2714', fg='green')
@@ -55,16 +58,18 @@ def api():
 
 
 @api.command()
+@click.option('--debug/-d', help='Display Flask Debug Output', is_flag=True)
+@click.option('--live', help='Connect to AWS Server', is_flag=True)
 @click.argument('service', default='all', type=click.Choice([*Service.SERVICE_LIST, 'all']))
-def start(service):
+def start(service, debug, live):
     """
     Starts the various services used during API development
     """
     if service == 'all':
         s.info(
             f"Starting all services: $[{', '.join(map(str, [s for s in Service.SERVICE_LIST]))}]\n")
-        return [Service(s).start() for s in Service.SERVICE_LIST]
-    service = Service(service)
+        return [Service(s, debug=debug, live=live).start() for s in Service.SERVICE_LIST]
+    service = Service(service, debug=debug, live=live)
     s.info(f"Starting $[{service.name}]\n")
     service.start()
 
@@ -91,3 +96,16 @@ def restart(service):
     service = Service(service)
     s.info(f"Restarting $[{service.name}]")
     service.restart()
+
+
+@cli.group()
+def app():
+    '''
+    WarriorBeatApp Management
+    '''
+    click.echo()
+
+
+# @app.command()
+# def start():
+#     pass
