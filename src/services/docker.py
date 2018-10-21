@@ -18,7 +18,7 @@ DOCKER = {
     },
     's3': {
         'image': 'scality/s3server:mem-latest',
-        'ports': {9000: 8000},
+        'ports': {8000: 9000},
         'name': 's3server'
     },
 }
