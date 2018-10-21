@@ -5,6 +5,7 @@
 
 import os
 import subprocess as subp
+import threading
 from pathlib import Path
 
 import click
@@ -12,7 +13,7 @@ import psutil
 from git import Repo
 
 from utils import ServiceLog
-import threading
+
 from .service import GenericService
 
 FLASK = {

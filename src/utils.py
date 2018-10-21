@@ -107,6 +107,22 @@ class ServiceLog:
         except Exception:
             return None
 
+    def diff_print(self, diff):
+        for line in iter(diff, b''):
+            line = line.decode('utf-8').rstrip()
+            if line.startswith('+++'):
+                yield secho(line, fg='bright_blue', nl=False)
+            elif line.startswith('---'):
+                yield secho(f"\n{line}", fg='blue', nl=False, dim=True)
+            elif line.startswith('-'):
+                yield secho(line, fg='bright_red', nl=False)
+            elif line.startswith('+'):
+                yield secho(line, fg='green', nl=False)
+            elif line.startswith('@'):
+                yield secho(line, fg='bright_yellow', nl=False)
+            else:
+                yield line
+
     def clear(self):
         """Clears terminal screen"""
         return clear()

@@ -5,13 +5,15 @@
 """
 
 import os
+import subprocess as subp
+import time
 
 import click
+from art import text2art
+from tabulate import tabulate
 
 from services import Service
 from utils import ServiceLog
-from tabulate import tabulate
-from art import text2art
 
 s = ServiceLog('WBCLI', 'bright_blue', root=True)
 
@@ -30,6 +32,43 @@ def setaws(profile):
     os.environ['AWS_PROFILE'] = profile
     click.secho('AWS Profile Set to: ', fg='green', nl=False)
     click.secho(f'{profile}', fg='cyan', bold=True)
+
+
+@cli.command()
+@click.option('--in-place', help='Make the changes', is_flag=True)
+@click.argument('path', type=click.Path(exists=True, resolve_path=True), default='.')
+def clean(path, in_place):
+    '''
+    Recursively clean project with autoflake, autopep8, and isort.
+    Requires autoflake, autopep8, and isort.
+    Default: Current Directory
+    '''
+    s.info("Running autoflake...")
+    flake_args = ['autoflake', '--remove-all-unused-imports', '-r', path]
+    if in_place:
+        del flake_args[3]
+        flake_args.extend(['--in-place', path])
+    flake_proc = subp.Popen(flake_args, stdout=subp.PIPE)
+    for l in s.diff_print(flake_proc.stdout.readline):
+        click.echo(l)
+    s.info('Autoflake complete')
+    s.info('Starting autopep8...')
+    time.sleep(3)
+    pep_args = ['autopep8', '-rd', path]
+    if in_place:
+        pep_args[1] = '-ri'
+    pep_proc = subp.Popen(pep_args)
+    s.info('Autopep8 complete')
+    s.info('Starting isort...')
+    time.sleep(3)
+    sort_args = ['isort', '-rc', '--diff', '--check-only', path]
+    if in_place:
+        del sort_args[2]
+        del sort_args[2]
+    sort_proc = subp.Popen(sort_args, stdout=subp.PIPE)
+    for l in s.diff_print(sort_proc.stdout.readline):
+        click.echo(l)
+    s.info('Cleaning Complete')
 
 
 @cli.command()
