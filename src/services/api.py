@@ -12,7 +12,7 @@ import click
 import psutil
 from git import Repo
 
-from utils import ServiceLog
+from utils import ServiceLog, ch_dir
 
 from .service import GenericService
 
@@ -22,7 +22,7 @@ FLASK = {
         'origin_url': 'https://github.com/WarriorBeat/WarriorBeatApi.git',
         'port': '5000',
         'env': {'FLASK_APP': 'warriorbeat', 'FLASK_ENV': 'development', 'FLASK_TESTING': 'True'},
-        'args': ['flask', 'run', '-p']
+        'args': "pipenv run flask run"
     }
 }
 
@@ -99,13 +99,17 @@ class APIService(GenericService):
             env_val = self.data['env'][evar]
             self.log.info(
                 f"$[{evar}] \u279C $w[{'...' + env_val[20:] if len(env_val) > 20 else env_val}]")
-            os.environ[evar] = self.data['env'][evar]
         args = self.data['args']
-        args.append(self.data['port'])
+        args = args + f" -p {self.data['port']}"
         out = subp.DEVNULL
         if self.debug:
             out = subp.PIPE
-        flask_proc = psutil.Popen(args, stdout=out, stderr=subp.STDOUT)
+        try:
+            with ch_dir(self.path):
+                flask_proc = psutil.Popen(args, stdout=out, stderr=subp.STDOUT, cwd=str(
+                    self.path), shell=True, env=dict(os.environ, **self.data['env']))
+        except FileNotFoundError:
+            return self.log.error(f"This service requires the $[Flask] python microframework.")
         if self.debug:
             outp = threading.Thread(
                 target=self._output_flask, args=(flask_proc, ))

@@ -6,7 +6,8 @@
 import configparser
 import re
 from pathlib import Path
-
+import os
+from contextlib import contextmanager
 from click import clear, confirm, prompt, secho, style
 
 
@@ -126,3 +127,10 @@ class ServiceLog:
     def clear(self):
         """Clears terminal screen"""
         return clear()
+
+
+@contextmanager
+def ch_dir(path):
+    cur_dir = Path.cwd()
+    yield os.chdir(str(path))
+    os.chdir(cur_dir)
