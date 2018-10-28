@@ -8,12 +8,15 @@ import subprocess as subp
 import threading
 from pathlib import Path
 
+import boto3
 import click
 import psutil
+from botocore.exceptions import ClientError
 from git import Repo
 
 from utils import ServiceLog, ch_dir
 
+from . import resource as res
 from .service import GenericService
 
 FLASK = {
@@ -31,7 +34,7 @@ class APIService(GenericService):
     """API Type Services"""
     SERVICES = FLASK
 
-    def __init__(self, id, debug=False, live=False):
+    def __init__(self, id, debug=False, live=False, test=False):
         self.id = id
         self.log = ServiceLog('API', 'bright_magenta')
         self.data = FLASK[self.id]
@@ -39,6 +42,7 @@ class APIService(GenericService):
         self.path = None
         self.debug = debug
         self.live = live
+        self.is_test = test
 
     def _validate_path(self, path):
         try:
@@ -110,13 +114,38 @@ class APIService(GenericService):
                     self.path), shell=True, env=dict(os.environ, **self.data['env']))
         except FileNotFoundError:
             return self.log.error(f"This service requires the $[Flask] python microframework.")
+        outp = None
         if self.debug:
             outp = threading.Thread(
                 target=self._output_flask, args=(flask_proc, ))
-            outp.start()
         self.log.info(f"API started on port $[{self.data['port']}]")
         self.log.save('API', 'PID', str(flask_proc.pid))
-        return self.log.info(f'$[{self.name}] is $w[live!]')
+        if not self.is_test and not self.live:
+            try:
+                self.setup_resources()
+            except ClientError:
+                self.log.warn("Resources already exist!")
+        self.log.info(f'$[{self.name}] is $w[live!]\n')
+        if outp is not None:
+            outp.start()
+        return flask_proc
+
+    def setup_resources(self):
+        """creates database tables and buckets"""
+        self.log.info("Creating resources...")
+        dbclient = boto3.resource(
+            'dynamodb', region_name='localhost', endpoint_url='http://localhost:8000')
+        s3client = boto3.client('s3', region_name='localhost',
+                                endpoint_url='http://localhost:9000',
+                                aws_access_key_id='accessKey1', aws_secret_access_key='verySecretKey1')
+        s3resource = boto3.resource(
+            's3', region_name='localhost', endpoint_url='http://localhost:9000', aws_access_key_id='accessKey1', aws_secret_access_key='verySecretKey1')
+        self.resources = {}
+        self.resources['tables'] = [res.create_table(
+            dbclient, res.TABLES[t], self.log) for t in res.TABLES]
+        self.resources['buckets'] = [res.create_bucket(
+            s3client, s3resource, res.BUCKETS[b], self.log) for b in res.BUCKETS]
+        return self.resources
 
     def stop(self):
         """stops api service"""

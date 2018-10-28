@@ -11,7 +11,8 @@ setup(
         'psutil',
         'tabulate',
         'art',
-        'docker'
+        'docker',
+        'boto3'
     ],
     entry_points='''
         [console_scripts]

@@ -4,10 +4,11 @@
 
 """
 import configparser
-import re
-from pathlib import Path
 import os
+import re
 from contextlib import contextmanager
+from pathlib import Path
+
 from click import clear, confirm, prompt, secho, style
 
 

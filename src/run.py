@@ -1,7 +1,9 @@
 """
     run.py
     Command Line Interface for WarriorBeat
-
+    
+    Rapidly put together with the sole purpose of working
+    for WarriorBeat purposes. Not the most clean program out there...
 """
 
 import os
@@ -97,18 +99,19 @@ def api():
 
 
 @api.command()
-@click.option('--debug/-d', help='Display Flask Debug Output', is_flag=True)
-@click.option('--live', help='Connect to AWS Server', is_flag=True)
+@click.option('--debug', '-d', help='Display Flask Debug Output', is_flag=True)
+@click.option('--live', '-l', help='Connect to AWS Server', is_flag=True)
+@click.option('--test', '-t',  help='Skips resource creation (for Unit tests)', is_flag=True)
 @click.argument('service', default='all', type=click.Choice([*Service.SERVICE_LIST, 'all']))
-def start(service, debug, live):
+def start(service, debug, live, test):
     """
     Starts the various services used during API development
     """
     if service == 'all':
         s.info(
             f"Starting all services: $[{', '.join(map(str, [s for s in Service.SERVICE_LIST]))}]\n")
-        return [Service(s, debug=debug, live=live).start() for s in Service.SERVICE_LIST]
-    service = Service(service, debug=debug, live=live)
+        return [Service(s, debug=debug, live=live, test=test).start() for s in Service.SERVICE_LIST]
+    service = Service(service, debug=debug, live=live, test=test)
     s.info(f"Starting $[{service.name}]\n")
     service.start()
 

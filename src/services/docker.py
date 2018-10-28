@@ -28,7 +28,7 @@ class DockerService(GenericService):
     """Management for docker related services"""
     SERVICES = DOCKER
 
-    def __init__(self, id, debug=False, live=False):
+    def __init__(self, id, debug=False, live=False, **kwargs):
         self.id = id
         self.live = live
         self.log = ServiceLog('Docker', 'cyan')
