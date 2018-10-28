@@ -1,0 +1,68 @@
+[
+  {
+    "postId": "548",
+    "title": "A New Post",
+    "content": "wow look at this post!",
+    "author": {
+      "authorId": "1",
+      "name": "admin",
+      "title": "administrator",
+      "description": "Staff Member",
+      "profile_image": {
+        "name": "admin",
+        "source": "http://0.gravatar.com/avatar/33ae6d29d41e713aca62fb52405ebe29?s=96&d=mm&r=g",
+        "mediaId": "1"
+      }
+    },
+    "cover_image": {
+      "mediaId": "549",
+      "source": "https://iso.500px.com/wp-content/uploads/2018/02/500px_blog_landscape_photography_quest-1500x1000.jpg",
+      "title": "A New Post"
+    },
+    "type": "article"
+  },
+  {
+    "postId": "544",
+    "title": "From Wordpress Hook",
+    "content": "Only the finests",
+    "author": {
+      "authorId": "1",
+      "name": "admin",
+      "title": "administrator",
+      "description": "Staff Member",
+      "profile_image": {
+        "name": "admin",
+        "source": "http://0.gravatar.com/avatar/33ae6d29d41e713aca62fb52405ebe29?s=96&d=mm&r=g",
+        "mediaId": "1"
+      }
+    },
+    "cover_image": {
+      "mediaId": "545",
+      "source": "https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg",
+      "title": "From Wordpress Hook"
+    },
+    "type": "article"
+  },
+  {
+    "postId": "539",
+    "title": "An Amazing Post",
+    "content": "Only the best",
+    "author": {
+      "authorId": "1",
+      "name": "admin",
+      "title": "administrator",
+      "description": "Staff Member",
+      "profile_image": {
+        "name": "admin",
+        "source": "http://0.gravatar.com/avatar/33ae6d29d41e713aca62fb52405ebe29?s=96&d=mm&r=g",
+        "mediaId": "1"
+      }
+    },
+    "cover_image": {
+      "mediaId": "537",
+      "source": "http://www.spanishandsurf.net/wordpress/wp-content/uploads/Paisaje_25-520x265.jpg",
+      "title": "An Amazing Post"
+    },
+    "type": "article"
+  }
+]

@@ -34,7 +34,7 @@ class APIService(GenericService):
     """API Type Services"""
     SERVICES = FLASK
 
-    def __init__(self, id, debug=False, live=False, test=False):
+    def __init__(self, id, debug=False, live=False, test=False, sample=False):
         self.id = id
         self.log = ServiceLog('API', 'bright_magenta')
         self.data = FLASK[self.id]
@@ -43,6 +43,7 @@ class APIService(GenericService):
         self.debug = debug
         self.live = live
         self.is_test = test
+        self.upload_sample = sample
 
     def _validate_path(self, path):
         try:
@@ -125,6 +126,9 @@ class APIService(GenericService):
                 self.setup_resources()
             except ClientError:
                 self.log.warn("Resources already exist!")
+            if self.upload_sample:
+                self.log.info("Uploading sample data...")
+                res.upload_sample_data(self.log)
         self.log.info(f'$[{self.name}] is $w[live!]\n')
         if outp is not None:
             outp.start()

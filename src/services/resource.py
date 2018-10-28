@@ -2,7 +2,11 @@
     services/resource.py
     Resource management for API
 """
+import json
+import requests
+from pathlib import Path
 
+post_url = "http://127.0.0.1:5000/api/posts"
 
 TABLES = {
     'author': {
@@ -61,3 +65,15 @@ def create_bucket(client, resource, bucket, logger):
     new_bucket = resource.Bucket(bucket['bucket_name'])
     logger.info(f"$[{bucket['bucket_name']}] \u279C $w[ACTIVE]")
     return new_bucket
+
+
+def upload_sample_data(logger):
+    """uploads sample post data to api"""
+    current_file = Path(__file__).parent.resolve()
+    sample_file = current_file / 'sample.json'
+    logger.info(f"Loading sample data from $[{sample_file.name}]")
+    sample_posts = json.load(sample_file.open(mode='r'))
+    for p in sample_posts:
+        logger.info(f"Uploading $[Post] \u279C $w[{p['title']}]")
+        req = requests.post(post_url, json=p)
+    return sample_posts
