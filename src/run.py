@@ -20,6 +20,7 @@ from utils import ServiceLog
 s = ServiceLog('WBCLI', 'bright_blue', root=True)
 
 
+@click.version_option(prog_name="WarriorBeatCli")
 @click.group()
 def cli():
     """
