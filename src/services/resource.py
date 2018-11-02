@@ -20,6 +20,14 @@ TABLES = {
     'media': {
         'table_name': 'media-table-dev',
         'primary_key': 'mediaId'
+    },
+    'feedback': {
+        'table_name': 'user-feedback-table-dev',
+        'primary_key': 'feedbackId'
+    },
+    'category': {
+        'table_name': 'category-table-dev',
+        'primary_key': 'categoryId'
     }
 }
 

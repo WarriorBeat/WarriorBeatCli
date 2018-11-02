@@ -19,7 +19,8 @@
       "source": "https://iso.500px.com/wp-content/uploads/2018/02/500px_blog_landscape_photography_quest-1500x1000.jpg",
       "title": "A New Post"
     },
-    "type": "article"
+    "type": "article",
+    "categories": [{ "categoryId": "1", "name": "News" }]
   },
   {
     "postId": "544",
@@ -41,7 +42,8 @@
       "source": "https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg",
       "title": "From Wordpress Hook"
     },
-    "type": "article"
+    "type": "article",
+    "categories": [{ "categoryId": "2", "name": "Sports" }]
   },
   {
     "postId": "539",
@@ -63,6 +65,10 @@
       "source": "http://www.spanishandsurf.net/wordpress/wp-content/uploads/Paisaje_25-520x265.jpg",
       "title": "An Amazing Post"
     },
-    "type": "article"
+    "type": "article",
+    "categories": [
+      { "categoryId": "1", "name": "News" },
+      { "categoryId": "2", "name": "Sports" }
+    ]
   }
 ]
