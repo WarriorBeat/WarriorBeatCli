@@ -24,7 +24,7 @@ FLASK = {
         'name': 'WarriorBeatApi',
         'origin_url': 'https://github.com/WarriorBeat/WarriorBeatApi.git',
         'port': '5000',
-        'env': {'FLASK_APP': 'warriorbeat', 'FLASK_ENV': 'development', 'FLASK_TESTING': 'True'},
+        'env': {'FLASK_APP': 'warriorbeat', 'FLASK_ENV': 'development', 'FLASK_TESTING': 'True', 'AWS_DEV': 'True'},
         'args': "pipenv run flask run"
     }
 }
