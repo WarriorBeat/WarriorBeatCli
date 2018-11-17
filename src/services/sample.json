@@ -6,7 +6,7 @@
     "author": {
       "authorId": "1",
       "name": "admin",
-      "title": "administrator",
+      "title": ["administrator", "staff_writer"],
       "description": "Staff Member",
       "profile_image": {
         "name": "admin",
@@ -29,7 +29,7 @@
     "author": {
       "authorId": "1",
       "name": "admin",
-      "title": "administrator",
+      "title": ["subscriber", "graphic_designer"],
       "description": "Staff Member",
       "profile_image": {
         "name": "admin",
@@ -52,7 +52,7 @@
     "author": {
       "authorId": "1",
       "name": "admin",
-      "title": "administrator",
+      "title": ["photographer"],
       "description": "Staff Member",
       "profile_image": {
         "name": "admin",
