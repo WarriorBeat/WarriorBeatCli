@@ -28,6 +28,10 @@ TABLES = {
     'category': {
         'table_name': 'category-table-dev',
         'primary_key': 'categoryId'
+    },
+    'poll': {
+        'table_name': 'poll-table-dev',
+        'primary_key': 'pollId'
     }
 }
 
