@@ -10,6 +10,8 @@ from utils import ServiceLog
 
 from .service import GenericService
 
+from docker.errors import ImageNotFound
+
 DOCKER = {
     'db': {
         'image': 'amazon/dynamodb-local',
@@ -57,12 +59,26 @@ class DockerService(GenericService):
         except:
             return None
 
-    def _create(self):
+    def _create(self, image=None):
         """creates container"""
         client = self.client.containers
         self.log.info(f"Container $[{self.name}] not found. Creating now...")
-        container = client.create(**self.data, detach=True)
+        if image:
+            self.data['image'] = image
+        try:
+            container = client.create(**self.data, detach=True)
+        except ImageNotFound:
+            self.log.info(
+                f"Image $[{self.data['image']}] not found, pulling from registry...")
+            img = self._get_image(self.data['image'])
+            return self._create(image=img)
         return container
+
+    def _get_image(self, image):
+        """downloads container image"""
+        registry = self.client.images.get_registry_data(image)
+        image = registry.pull()
+        return image
 
     def _is_running(self, container=None):
         """checks if a container is running"""
