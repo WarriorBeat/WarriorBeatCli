@@ -32,6 +32,10 @@ TABLES = {
     'poll': {
         'table_name': 'poll-table-dev',
         'primary_key': 'pollId'
+    },
+    'user': {
+        'table_name': 'user-table-dev',
+        'primary_key': 'userId'
     }
 }
 
