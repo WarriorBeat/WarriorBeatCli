@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='WarriorBeatCli',
-    version='1.0.0',
+    version='1.1.2',
     py_modules=['run'],
     packages=find_packages(),
     install_requires=[
