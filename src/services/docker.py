@@ -5,12 +5,11 @@
 
 
 import docker
+from docker.errors import ImageNotFound
 
 from utils import ServiceLog
 
 from .service import GenericService
-
-from docker.errors import ImageNotFound
 
 DOCKER = {
     'db': {

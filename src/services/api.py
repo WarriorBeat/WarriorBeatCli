@@ -22,7 +22,7 @@ from .service import GenericService
 FLASK = {
     'api': {
         'name': 'WarriorBeatApi',
-        'origin_url': 'https://github.com/WarriorBeat/WarriorBeatApi.git',
+        'origin_url': 'github.com/WarriorBeat/WarriorBeatApi',
         'port': '5000',
         'env': {'FLASK_APP': 'warriorbeat', 'FLASK_ENV': 'development', 'FLASK_TESTING': 'True', 'AWS_DEV': 'True'},
         'args': "pipenv run flask run"
@@ -48,8 +48,9 @@ class APIService(GenericService):
     def _validate_path(self, path):
         try:
             repo = Repo(path)
-            url = repo.remotes.origin.url
-            assert url == self.data['origin_url']
+            full_url = repo.remotes.origin.url
+            url = full_url.split('://')[1]
+            assert url == self.data['origin_url'] or url == self.data['origin_url'] + '.git'
             return path
         except AssertionError:
             self.log.error(f'{path} is not the WarriorBeatApi Repo')
