@@ -7,10 +7,13 @@ import os
 import subprocess as subp
 import threading
 from pathlib import Path
+from time import sleep
 
 import boto3
 import click
 import psutil
+import requests
+import yaml
 from botocore.exceptions import ClientError
 from git import Repo
 
@@ -25,7 +28,7 @@ FLASK = {
         'origin_url': 'github.com/WarriorBeat/WarriorBeatApi',
         'port': '5000',
         'env': {'FLASK_APP': 'warriorbeat', 'FLASK_ENV': 'development', 'FLASK_TESTING': 'True', 'AWS_DEV': 'True'},
-        'args': "pipenv run flask run"
+        'args': "pipenv run flask run",
     }
 }
 
@@ -44,6 +47,7 @@ class APIService(GenericService):
         self.live = kwargs.get("live", False)
         self.is_test = kwargs.get("test", False)
         self.upload_sample = kwargs.get("sample_data", False)
+        self.ngrok = kwargs.get("ngrok", False)
 
     def _validate_path(self, path):
         try:
@@ -66,7 +70,7 @@ class APIService(GenericService):
             if path_config is not None:
                 path = Path(path_config)
                 self.log.info(
-                    f'Found path in config ({"..." + str(path)[-25:]})')
+                    f'Found path in config ({"..." + str(path)[-15:]})')
                 return path
             path = self.log.prompt('Where is your WarriorBeatApi located? ',
                                    default=env, show_default=False, nl=True, type=click.Path(resolve_path=True))
@@ -81,10 +85,10 @@ class APIService(GenericService):
                     self.data['env']['API_DIR'] = str(path.resolve())
         return path
 
-    def _is_running(self):
+    def _is_running(self, conf_id='PID'):
         """checks if api is running"""
         try:
-            last_pid = int(self.log.retrieve('API', 'PID'))
+            last_pid = int(self.log.retrieve('API', conf_id))
             return last_pid if psutil.pid_exists(last_pid) is True else False
         except:
             return False
@@ -131,6 +135,9 @@ class APIService(GenericService):
                 self.log.info("Uploading sample data...")
                 res.upload_sample_data(self.log)
         self.log.info(f'$[{self.name}] is $w[live!]\n')
+        # Handle Ngrok
+        if self.ngrok:
+            self.create_ngrok()
         if outp is not None:
             outp.start()
         return flask_proc
@@ -152,11 +159,73 @@ class APIService(GenericService):
             s3client, s3resource, res.BUCKETS[b], self.log) for b in res.BUCKETS]
         return self.resources
 
+    def get_ngrok_config(self):
+        """retrieves/creates ngrok config"""
+        self.log.info("Fetching $[ngrok] config...")
+        saved_config = self.log.retrieve("API", "NGROK_CONFIG")
+        if saved_config:
+            return saved_config
+        self.log.info("Config not found, creating one now...")
+        auth = self.log.prompt("What is your ngrok auth code? ",
+                               show_default=False, nl=True)
+        config = {
+            'authtoken': auth,
+            'tunnels': {
+                'api': {
+                    'addr': self.data['port'],
+                    'proto': 'http'
+                }
+            }
+        }
+        config_file = Path(self.log.config_path / 'ngrok.yml')
+        with config_file.open('w') as conf:
+            yaml.dump(config, conf, default_flow_style=False)
+        config_file = str(config_file.resolve())
+        self.log.save("API", "NGROK_CONFIG", config_file)
+        self.log.info(
+            f'Config saved to => ({"..." + str(config_file)[-15:]})')
+        return config_file
+
+    def retrieve_ngrok_tunnel(self):
+        """retrieves public ngrok tunnel url"""
+        tunnel_endpoint = "http://localhost:4040/api/tunnels"
+        retr = requests.get(tunnel_endpoint).json()
+        tunnel = retr['tunnels'][0]['public_url']
+        return tunnel
+
+    def create_ngrok(self):
+        """creates ngrok tunnel for api"""
+        if self._is_running(conf_id="NGROK_PID"):
+            tunnel = self.retrieve_ngrok_tunnel()
+            return self.log.info(f"$[ngrok] tunnel already running at \u279C $w[{tunnel}]")
+        config = self.get_ngrok_config()
+        self.log.info("Config loaded...")
+        self.log.info(
+            f"Starting $[ngrok] tunnel on port $w[{self.data['port']}]")
+        ngrok_proc = psutil.Popen(f"ngrok start -config {config} api", stdout=subp.DEVNULL,
+                                  stderr=subp.STDOUT, shell=True)
+        self.log.save('API', 'NGROK_PID', str(ngrok_proc.pid))
+        sleep(5)  # lazily giving ngrok time to start
+        tunnel = self.retrieve_ngrok_tunnel()
+        self.log.info(f'$[ngrok] tunnel launched at \u279C $w[{tunnel}]')
+
+    def kill_ngrok(self):
+        """kills ngrok process if running"""
+        pid = self._is_running(conf_id="NGROK_PID")
+        if pid:
+            self.log.info("Terminating ngrok tunnel...")
+            ngrok_proc = psutil.Process(pid)
+            ngrok_proc.terminate()
+            self.log.save("API", "NGROK_PID", "")
+            return self.log.info(f"$[ngrok] tunnel has been stopped!")
+        return False
+
     def stop(self):
         """stops api service"""
         pid = self._is_running()
         if not pid:
             return self.log.error(f"{self.name} is not running!")
+        self.kill_ngrok()
         self.log.info("Terminating flask process...")
         flask_proc = psutil.Process(pid)
         flask_proc.terminate()
