@@ -34,16 +34,16 @@ class APIService(GenericService):
     """API Type Services"""
     SERVICES = FLASK
 
-    def __init__(self, id, debug=False, live=False, test=False, sample=False):
+    def __init__(self, id, **kwargs):
         self.id = id
         self.log = ServiceLog('API', 'bright_magenta')
         self.data = FLASK[self.id]
         self.name = self.data['name']
         self.path = None
-        self.debug = debug
-        self.live = live
-        self.is_test = test
-        self.upload_sample = sample
+        self.debug = kwargs.get("debug", False)
+        self.live = kwargs.get("live", False)
+        self.is_test = kwargs.get("test", False)
+        self.upload_sample = kwargs.get("sample_data", False)
 
     def _validate_path(self, path):
         try:

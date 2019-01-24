@@ -104,17 +104,17 @@ def api():
 @click.option('--live', '-l', help='Connect to AWS Server', is_flag=True)
 @click.option('--test', '-t',  help='Skips resource creation (for Unit tests)', is_flag=True)
 @click.option('--sample-data', '-s',  help='Upload Sample Data to API', is_flag=True)
+@click.option('--ngrok', '-n',  help='Start ngrok Tunnel', is_flag=True)
 @click.argument('service', default='all', type=click.Choice([*Service.SERVICE_LIST, 'all']))
-def start(service, debug, live, test, sample_data):
+def start(service, *args, **kwargs):
     """
     Starts the various services used during API development
     """
     if service == 'all':
         s.info(
             f"Starting all services: $[{', '.join(map(str, [s for s in Service.SERVICE_LIST]))}]\n")
-        return [Service(s, debug=debug, live=live, test=test, sample=sample_data).start() for s in Service.SERVICE_LIST]
-    service = Service(service, debug=debug, live=live,
-                      test=test, sample=sample_data)
+        return [Service(s, *args, **kwargs).start() for s in Service.SERVICE_LIST]
+    service = Service(service, *args, **kwargs)
     s.info(f"Starting $[{service.name}]\n")
     service.start()
 
