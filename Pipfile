@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 click = "*"
 docker = "*"
-warriorbeatcli = {editable = true, path = "./src"}
+warriorbeatcli = {editable = true,path = "./src"}
 tqdm = "*"
 pylint = "*"
 colorama = "*"
@@ -16,6 +16,7 @@ blessed = "*"
 gitpython = "*"
 psutil = "*"
 "boto3" = "*"
+bs4 = "*"
 
 [dev-packages]
 pylint = "*"

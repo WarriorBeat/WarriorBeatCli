@@ -20,6 +20,7 @@ from git import Repo
 from utils import ServiceLog, ch_dir
 
 from . import resource as res
+from . import scrape
 from .service import GenericService
 
 FLASK = {
@@ -47,6 +48,7 @@ class APIService(GenericService):
         self.live = kwargs.get("live", False)
         self.is_test = kwargs.get("test", False)
         self.upload_sample = kwargs.get("sample_data", False)
+        self.upload_scrape = kwargs.get("scrape_data", False)
         self.ngrok = kwargs.get("ngrok", False)
 
     def _validate_path(self, path):
@@ -134,6 +136,9 @@ class APIService(GenericService):
             if self.upload_sample:
                 self.log.info("Uploading sample data...")
                 res.upload_sample_data(self.log)
+            if self.upload_scrape:
+                self.log.info("Scraping and Uploading data...")
+                scrape.upload_scraped_data(self.log)
         self.log.info(f'$[{self.name}] is $w[live!]\n')
         # Handle Ngrok
         if self.ngrok:

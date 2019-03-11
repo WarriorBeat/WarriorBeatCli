@@ -104,6 +104,7 @@ def api():
 @click.option('--live', '-l', help='Connect to AWS Server', is_flag=True)
 @click.option('--test', '-t',  help='Skips resource creation (for Unit tests)', is_flag=True)
 @click.option('--sample-data', '-s',  help='Upload Sample Data to API', is_flag=True)
+@click.option('--scrape-data', '-S',  help='Upload Data Scraped from Website', is_flag=True)
 @click.option('--ngrok', '-n',  help='Start ngrok Tunnel', is_flag=True)
 @click.argument('service', default='all', type=click.Choice([*Service.SERVICE_LIST, 'all']))
 def start(service, *args, **kwargs):
